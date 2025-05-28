@@ -1,0 +1,56 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Build Artifacts
+.vercel
+/.next/
+/out/
+/build
+/dist/
+
+# Testing & Coverage
+/coverage
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Credentials & Environment Variables
+*.pem
+.env
+.env*.local
+
+# Deployment
+.cloudflare
+.wrangler
+wrangler.toml
+*.secret.toml
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Editors & IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Credentials
+.dev.vars
+*.pem
+
+
+# Operating Systems & Miscellaneous
+.DS_Store
+Thumbs.db
+.localized
+*.swp
+*~
