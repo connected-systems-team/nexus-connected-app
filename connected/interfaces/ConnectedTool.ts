@@ -1,3 +1,4 @@
+import { GridRegionLevels } from './region/GridRegionLevels';
 import { DnsTool } from './tools/DnsTool';
 import { DnsTraceTool } from './tools/DnsTraceTool';
 import { FetchTool } from './tools/FetchTool';
@@ -55,10 +56,13 @@ export namespace ConnectedTool {
 
     export type WithBrand<T, Type extends ConnectedTool.Type> = T & Brand<Type>;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    export type Unbrand<T> = T extends infer U & Brand<any> ? U : T;
-
-    export type WithRegion<T> = Omit<T, 'toolType'> & {
-        regionId: string;
+    export type WithRegion<T> = T & {
+        regions?: ReadonlyArray<GridRegionLevels>;
     };
+
+    // Extract a specific tool type by its toolType value
+    export type ExtractByToolType<T extends ConnectedTool.Type, K> = Extract<
+        K,
+        { toolType: T }
+    >;
 }
