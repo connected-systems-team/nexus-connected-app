@@ -1,16 +1,16 @@
-// ESLint rule to disallow imports using the aliases '@project' or '@structure' from files within 'libraries/nexus'
+// ESLint rule to disallow imports using the aliases '@project' or '@structure' or '@base' from files within 'libraries/nexus'
 const NoNexusProjectOrBaseImportsRule = {
     meta: {
         type: 'problem',
         docs: {
             description:
-                "Disallow imports using the aliases '@project' or '@structure' from files within 'libraries/nexus'.",
+                "Disallow imports using the aliases '@project' or '@structure' or '@base' from files within 'libraries/nexus'.",
             category: 'Possible Errors',
             recommended: false,
         },
         messages: {
             forbiddenImport:
-                "Importing from '@project' or '@structure' is not allowed within 'libraries/nexus'.",
+                "Importing from '@project' or '@structure' or '@base' is not allowed within 'libraries/nexus'.",
         },
     },
     create(context) {
@@ -24,13 +24,15 @@ const NoNexusProjectOrBaseImportsRule = {
 
         return {
             ImportDeclaration(node) {
-                if(!isInNexusLibrary) return;
+                if (!isInNexusLibrary) return;
 
                 const importSource = node.source.value;
 
-                if(
+                if (
                     typeof importSource === 'string' &&
-                    (importSource.startsWith('@project') || importSource.startsWith('@structure'))
+                    (importSource.startsWith('@project') ||
+                        importSource.startsWith('@structure') ||
+                        importSource.startsWith('@base'))
                 ) {
                     context.report({
                         node,
@@ -39,18 +41,20 @@ const NoNexusProjectOrBaseImportsRule = {
                 }
             },
             CallExpression(node) {
-                if(!isInNexusLibrary) return;
+                if (!isInNexusLibrary) return;
 
-                if(
+                if (
                     node.callee.type === 'Identifier' &&
                     node.callee.name === 'require'
                 ) {
                     const argument = node.arguments[0];
-                    if(
+                    if (
                         argument &&
                         argument.type === 'Literal' &&
                         typeof argument.value === 'string' &&
-                        (argument.value.startsWith('@project') || argument.value.startsWith('@structure'))
+                        (argument.value.startsWith('@project') ||
+                            argument.value.startsWith('@structure') ||
+                            argument.value.startsWith('@base'))
                     ) {
                         context.report({
                             node,
@@ -60,14 +64,16 @@ const NoNexusProjectOrBaseImportsRule = {
                 }
             },
             ImportExpression(node) {
-                if(!isInNexusLibrary) return;
+                if (!isInNexusLibrary) return;
 
                 const argument = node.source;
-                if(
+                if (
                     argument &&
                     argument.type === 'Literal' &&
                     typeof argument.value === 'string' &&
-                    (argument.value.startsWith('@project') || argument.value.startsWith('@structure'))
+                    (argument.value.startsWith('@project') ||
+                        argument.value.startsWith('@structure') ||
+                        argument.value.startsWith('@base'))
                 ) {
                     context.report({
                         node,
