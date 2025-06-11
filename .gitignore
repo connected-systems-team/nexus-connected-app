@@ -26,27 +26,29 @@ yarn-error.log*
 *.pem
 .env
 .env*.local
+.dev.vars
+*.pem
+certificates
 
 # Deployment
 .cloudflare
 .wrangler
-wrangler.toml
 *.secret.toml
+.worker-next
+.open-next
 
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
 
+# Caching
+.cache/
+.eslintcache
+
 # Editors & IDEs
-.vscode/
 .idea/
 *.sublime-workspace
 *.sublime-project
-
-# Credentials
-.dev.vars
-*.pem
-
 
 # Operating Systems & Miscellaneous
 .DS_Store
