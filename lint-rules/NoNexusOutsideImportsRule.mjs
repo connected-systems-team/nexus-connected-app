@@ -1,5 +1,5 @@
 // ESLint rule to disallow imports using the aliases '@project' or '@structure' or '@base' from files within 'libraries/nexus'
-const NoNexusProjectOrBaseImportsRule = {
+const NoNexusOutsideImportsRule = {
     meta: {
         type: 'problem',
         docs: {
@@ -24,11 +24,11 @@ const NoNexusProjectOrBaseImportsRule = {
 
         return {
             ImportDeclaration(node) {
-                if (!isInNexusLibrary) return;
+                if(!isInNexusLibrary) return;
 
                 const importSource = node.source.value;
 
-                if (
+                if(
                     typeof importSource === 'string' &&
                     (importSource.startsWith('@project') ||
                         importSource.startsWith('@structure') ||
@@ -41,14 +41,14 @@ const NoNexusProjectOrBaseImportsRule = {
                 }
             },
             CallExpression(node) {
-                if (!isInNexusLibrary) return;
+                if(!isInNexusLibrary) return;
 
-                if (
+                if(
                     node.callee.type === 'Identifier' &&
                     node.callee.name === 'require'
                 ) {
                     const argument = node.arguments[0];
-                    if (
+                    if(
                         argument &&
                         argument.type === 'Literal' &&
                         typeof argument.value === 'string' &&
@@ -64,10 +64,10 @@ const NoNexusProjectOrBaseImportsRule = {
                 }
             },
             ImportExpression(node) {
-                if (!isInNexusLibrary) return;
+                if(!isInNexusLibrary) return;
 
                 const argument = node.source;
-                if (
+                if(
                     argument &&
                     argument.type === 'Literal' &&
                     typeof argument.value === 'string' &&
@@ -86,4 +86,4 @@ const NoNexusProjectOrBaseImportsRule = {
 };
 
 // Export - Default
-export default NoNexusProjectOrBaseImportsRule;
+export default NoNexusOutsideImportsRule;
