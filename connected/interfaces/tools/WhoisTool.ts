@@ -1,3 +1,4 @@
+import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
 import { ConnectedTool } from '../ConnectedTool';
 import { ProcessOutput } from '../ProcessOutput';
 
@@ -63,6 +64,10 @@ export namespace WhoisTool {
             administrative?: WhoisRegistrarContact;
             technical?: WhoisRegistrarContact;
         };
+    }
+
+    export function validateInput(input: Input): void {
+        NetworkHost.getHost(input.host); // Validate domain format
     }
 
     /**

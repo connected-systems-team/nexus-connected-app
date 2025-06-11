@@ -1,3 +1,4 @@
+import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
 import { ConnectedTool } from '../ConnectedTool';
 
 export namespace DnsTool {
@@ -32,6 +33,10 @@ export namespace DnsTool {
             minttl: number;
         };
         errors?: Partial<Record<DnsRecordType, string>>;
+    }
+
+    export function validateInput(input: Input): void {
+        NetworkHost.getHost(input.domain); // Validate domain format
     }
 }
 

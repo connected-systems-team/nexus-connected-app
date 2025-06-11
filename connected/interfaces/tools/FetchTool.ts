@@ -1,3 +1,4 @@
+import { NetworkUrl } from '@nexus/connected/utilities/NetworkUrl';
 import { ConnectedTool } from '../ConnectedTool';
 
 export namespace FetchTool {
@@ -26,6 +27,10 @@ export namespace FetchTool {
         redirects?: FetchToolRedirect[];
         durationMs: number;
         error?: string;
+    }
+
+    export function validateInput(input: Input): void {
+        NetworkUrl.getUrl(input.url); // Validate URL format
     }
 }
 

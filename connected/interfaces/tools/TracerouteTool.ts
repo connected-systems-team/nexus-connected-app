@@ -1,3 +1,4 @@
+import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
 import { ConnectedTool } from '../ConnectedTool';
 import { ProcessOutput } from '../ProcessOutput';
 
@@ -26,6 +27,10 @@ export namespace TracerouteTool {
             stderr: string;
         };
     } & ConnectedTool.Brand<typeof Type>;
+
+    export function validateInput(input: Input): void {
+        NetworkHost.getHost(input.host); // Validate domain format
+    }
 
     /**
      * Parse the traceroute command output into a structured object

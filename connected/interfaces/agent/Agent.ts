@@ -14,52 +14,30 @@ export interface Agent {
      *
      * Set by the system when the agent is created.
      */
-    agentId: string;
-
-    /**
-     * The unique identifier for the agent.
-     * This is used to identify the agent in the system.
-     *
-     * This should be the id of the AgentEntity that this specification
-     * is associated with.
-     *
-     * Set by the system when the agent is created.
-     */
-    flowId: string;
-
-    /**
-     * The version of the flow that this agent is based on.
-     * This is used to ensure that the agent is using the correct version of the flow.
-     *
-     * This should be the id of the FlowVersionEntity that this specification
-     * is associated with.
-     *
-     * Set by the system when the agent is created or updated.
-     */
-    flowVersionId: string;
+    readonly agentId: string;
 
     /**
      * The name of the agent. This is a human-readable user facing name.
      */
-    name: string;
+    readonly name: string;
 
     /**
      * An optional description of the agent.
      */
-    description?: string;
+    readonly description?: string;
 
     /**
      * The user account ID of the user that created this agent.
      */
-    createdByAccountId: string;
+    readonly createdByAccountId: string;
 
     /**
      * The profile ID of the user that created this agent.
      */
-    createdByProfileId: string;
+    readonly createdByProfileId: string;
 
     /**
      * The tools that the agent will use to perform its tasks.
      */
-    tools: AgentTool[];
+    readonly tools: AgentTool[];
 }

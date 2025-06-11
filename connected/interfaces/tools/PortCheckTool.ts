@@ -1,3 +1,5 @@
+import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
+import { NetworkPort } from '@nexus/connected/utilities/NetworkPort';
 import { ConnectedTool } from '../ConnectedTool';
 import { ProcessOutput } from '../ProcessOutput';
 
@@ -32,6 +34,11 @@ export namespace PortCheckTool {
         addressesScanned: number;
         hostsUp: number;
         scanTime: string;
+    }
+
+    export function validateInput(input: Input): void {
+        NetworkHost.getHost(input.host); // Validate host format
+        NetworkPort.getPort(input.port); // Validate port number
     }
 
     export function parseOutput(

@@ -1,4 +1,5 @@
 import { ConnectedTool } from '../ConnectedTool';
+import { GridRegionLevels } from '../region/GridRegionLevels';
 import { AgentPredicate } from './AgentPredicate';
 
 export interface AgentTool<
@@ -17,11 +18,16 @@ export interface AgentTool<
     pathName: string;
 
     /**
-     * The region to run this agent in. No region specified means
-     * that the agent will run in a random region.
+     * The regions to run this agent in. No region specified means
+     * that the agent will run in a random region. More than one region
+     * specified means that the agent will randomly select a region among
+     * the ones specified on each run. Exaclty one region specified means
+     * that the agent will always run in that region.
+     *
+     * Not all tools support regions, so this is an optional field.
+     * If the tool does not support regions, this field will be ignored.
      */
-    regionId?: string;
-    // TODO switch this to an array
+    regions?: ReadonlyArray<GridRegionLevels>;
 
     /**
      * The schedule for the agent, this specifies how often the agent
@@ -99,6 +105,8 @@ export type AgentSchedule =
     | { kind: 'interval'; duration: string; anchor?: string };
 
 export type AgentNotificationSettings = {
+    destinationIds: string[];
+} & {
     preference:
         | {
               kind: 'always';

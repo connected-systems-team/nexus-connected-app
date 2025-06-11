@@ -1,3 +1,5 @@
+import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
+import { NetworkPort } from '@nexus/connected/utilities/NetworkPort';
 import { ConnectedTool } from '../ConnectedTool';
 
 export namespace TlsCertificateTool {
@@ -17,5 +19,10 @@ export namespace TlsCertificateTool {
         subjectAltNames?: string[];
         isValidHostname?: boolean;
         error?: string;
+    }
+
+    export function validateInput(input: Input): void {
+        NetworkHost.getHost(input.host); // Validate domain format
+        NetworkPort.getPort(input.port); // Validate port number
     }
 }

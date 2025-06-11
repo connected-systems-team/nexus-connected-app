@@ -65,4 +65,41 @@ export namespace ConnectedTool {
         K,
         { toolType: T }
     >;
+
+    export function validateInput(input: Input): asserts input is Input {
+        switch (input.toolType) {
+            case DnsTool.Type:
+                DnsTool.validateInput(input as DnsTool.Input);
+                break;
+            case DnsTraceTool.Type:
+                DnsTraceTool.validateInput(input as DnsTraceTool.Input);
+                break;
+            case FetchTool.Type:
+                FetchTool.validateInput(input as FetchTool.Input);
+                break;
+            case HttpTraceTool.Type:
+                HttpTraceTool.validateInput(input as HttpTraceTool.Input);
+                break;
+            case PingTool.Type:
+                PingTool.validateInput(input as PingTool.Input);
+                break;
+            case PortCheckTool.Type:
+                PortCheckTool.validateInput(input as PortCheckTool.Input);
+                break;
+            case TlsCertificateTool.Type:
+                TlsCertificateTool.validateInput(
+                    input as TlsCertificateTool.Input,
+                );
+                break;
+            case TracerouteTool.Type:
+                TracerouteTool.validateInput(input as TracerouteTool.Input);
+                break;
+            case WhoisTool.Type:
+                WhoisTool.validateInput(input as WhoisTool.Input);
+                break;
+            default:
+                //@ts-expect-error error for unknown tool types
+                throw new Error(`Unknown tool type: ${input.toolType}`);
+        }
+    }
 }
