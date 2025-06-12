@@ -10,7 +10,12 @@ export namespace DnsTraceTool {
         domain: string;
     }
 
-    export type Output = ConnectedTool.WithBrand<ProcessOutput, typeof Type>;
+    export type Output = ConnectedTool.WithBrand<
+        {
+            raw: ProcessOutput;
+        },
+        typeof Type
+    >;
 
     export function validateInput(input: Input): void {
         NetworkHost.getHost(input.domain); // Validate domain format

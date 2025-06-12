@@ -13,7 +13,13 @@ export namespace PortCheckTool {
         timeoutMs?: number;
     }
 
-    export type Output = ConnectedTool.WithBrand<ProcessOutput, typeof Type>;
+    export type Output = ConnectedTool.WithBrand<
+        {
+            parsed: Result;
+            raw: ProcessOutput;
+        },
+        typeof Type
+    >;
 
     export interface Result extends ConnectedTool.Brand<typeof Type> {
         nmapVersion: string;

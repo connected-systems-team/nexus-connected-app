@@ -10,7 +10,12 @@ export namespace HttpTraceTool {
         url: string;
     }
 
-    export type Output = ConnectedTool.WithBrand<ProcessOutput, typeof Type>;
+    export type Output = ConnectedTool.WithBrand<
+        {
+            raw: ProcessOutput;
+        },
+        typeof Type
+    >;
 
     export function validateInput(input: Input): void {
         NetworkUrl.getUrl(input.url); // Validate URL format
