@@ -113,6 +113,9 @@ export type AgentNotificationSettings = {
               kind: 'always';
           }
         | {
+              kind: 'failure';
+          }
+        | {
               kind: 'state-change';
           }
         | {
