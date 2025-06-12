@@ -44,11 +44,8 @@ export namespace PingTool {
         NetworkHost.getHost(input.host); // Validate domain format
     }
 
-    export function parseOutput(
-        target: string,
-        output: Output,
-    ): Result | undefined {
-        if (!output || !output.stdout) {
+    export function parseOutput(target: string, output: Output): Result | undefined {
+        if(!output || !output.stdout) {
             return;
         }
 
@@ -63,23 +60,19 @@ export namespace PingTool {
         };
 
         const resolvedLine = lines.find((line) => line.startsWith('PING '));
-        if (resolvedLine) {
-            const match = resolvedLine.match(
-                /^PING\s+(\S+)\s+\(([\d.:a-fA-F]+)\)/,
-            );
-            if (match) {
+        if(resolvedLine) {
+            const match = resolvedLine.match(/^PING\s+(\S+)\s+\(([\d.:a-fA-F]+)\)/);
+            if(match && match[1] && match[2]) {
                 result.target = match[1];
                 result.resolvedIp = match[2];
             }
         }
 
-        for (const line of lines) {
+        for(const line of lines) {
             try {
                 // Normal reply line (BSD/macOS)
-                const fullReply = line.match(
-                    /icmp_seq=(\d+)\s+ttl=(\d+)\s+time=([\d.]+)\s*ms/,
-                );
-                if (fullReply) {
+                const fullReply = line.match(/icmp_seq=(\d+)\s+ttl=(\d+)\s+time=([\d.]+)\s*ms/);
+                if(fullReply && fullReply[1] && fullReply[2] && fullReply[3]) {
                     result.responses.push({
                         seq: parseInt(fullReply[1], 10),
                         ttl: parseInt(fullReply[2], 10),
@@ -89,10 +82,10 @@ export namespace PingTool {
                 }
 
                 // Fallback reply parsing (Linux-style)
-                if (/from/.test(line) && /time=/.test(line)) {
+                if(/from/.test(line) && /time=/.test(line)) {
                     const ipMatch = line.match(/from\s+([\d.:a-fA-F]+)/);
                     const timeMatch = line.match(/time=([\d.]+)\s*ms/);
-                    if (ipMatch && timeMatch) {
+                    if(ipMatch && timeMatch && timeMatch[1]) {
                         result.responses.push({
                             seq: -1,
                             ttl: -1,
@@ -103,10 +96,8 @@ export namespace PingTool {
                 }
 
                 // Timeout line
-                const timeoutMatch = line.match(
-                    /Request timeout for icmp_seq (\d+)/,
-                );
-                if (timeoutMatch) {
+                const timeoutMatch = line.match(/Request timeout for icmp_seq (\d+)/);
+                if(timeoutMatch && timeoutMatch[1]) {
                     result.timeouts.push(parseInt(timeoutMatch[1], 10));
                     continue;
                 }
@@ -115,7 +106,7 @@ export namespace PingTool {
                 const statsMatch = line.match(
                     /^(\d+)\s+packets transmitted,\s+(\d+)\s+packets received,\s+([\d.]+)% packet loss/,
                 );
-                if (statsMatch) {
+                if(statsMatch && statsMatch[1] && statsMatch[2] && statsMatch[3]) {
                     result.transmitted = parseInt(statsMatch[1], 10);
                     result.received = parseInt(statsMatch[2], 10);
                     result.lossPercent = parseFloat(statsMatch[3]);
@@ -124,10 +115,8 @@ export namespace PingTool {
                 }
 
                 // RTT stats
-                const rttMatch = line.match(
-                    /round-trip.*=\s*([\d.]+)\/([\d.]+)\/([\d.]+)\/([\d.]+)\s*ms/,
-                );
-                if (rttMatch) {
+                const rttMatch = line.match(/round-trip.*=\s*([\d.]+)\/([\d.]+)\/([\d.]+)\/([\d.]+)\s*ms/);
+                if(rttMatch && rttMatch[1] && rttMatch[2] && rttMatch[3] && rttMatch[4]) {
                     result.rtt = {
                         min: parseFloat(rttMatch[1]),
                         avg: parseFloat(rttMatch[2]),
@@ -138,7 +127,7 @@ export namespace PingTool {
                 }
 
                 // Host not found (macOS)
-                if (/^ping: cannot resolve/.test(line)) {
+                if(/^ping: cannot resolve/.test(line)) {
                     result.success = false;
                     result.error = line.trim();
                     return result;
@@ -149,7 +138,7 @@ export namespace PingTool {
         }
 
         // Fallback: if no summary, but responses exist
-        if (result.responses.length > 0 && result.transmitted === undefined) {
+        if(result.responses.length > 0 && result.transmitted === undefined) {
             result.success = true;
         }
 

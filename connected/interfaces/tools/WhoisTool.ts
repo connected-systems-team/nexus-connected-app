@@ -75,7 +75,7 @@ export namespace WhoisTool {
      * Parses raw WHOIS stdout into a fully‑structured object.
      */
     export function parseOutput(output: Output): Result | undefined {
-        if (!output || !output.stdout) {
+        if(!output || !output.stdout) {
             return;
         }
 
@@ -91,89 +91,80 @@ export namespace WhoisTool {
         const tldLines: string[] = [];
         const domainLines: string[] = [];
 
-        for (const raw of lines) {
+        for(const raw of lines) {
             const line = raw.trim();
-            if (/^Domain Name:/i.test(line)) {
+            if(/^Domain Name:/i.test(line)) {
                 seenDomainHeader++;
                 // the **second** Domain Name: marks the start of the registrar block
-                if (seenDomainHeader === 2) {
+                if(seenDomainHeader === 2) {
                     section = 1;
                     continue; // don’t include this header in tldLines
                 }
             }
-            if (section === 0) {
+            if(section === 0) {
                 tldLines.push(raw);
-            } else if (section === 1) {
+            }
+            else if(section === 1) {
                 domainLines.push(raw);
             }
         }
 
         // --- Detect no‑match and last‑update anywhere ---
-        for (const raw of lines) {
+        for(const raw of lines) {
             const line = raw.trim();
-            if (!line) continue;
+            if(!line) continue;
 
             // No match
             const nm = line.match(/^No match for domain\s+"([^"]+)"/i);
-            if (nm) {
+            if(nm) {
                 result.matched = false;
                 result.noMatchDomain = nm[1];
                 break;
             }
         }
         // Last update
-        for (const raw of lines) {
+        for(const raw of lines) {
             const line = raw.trim();
-            const lu = line.match(
-                /^>>> Last update of whois.*?:\s*([0-9T:\-+.Z]+)/i,
-            );
-            if (lu) {
+            const lu = line.match(/^>>> Last update of whois.*?:\s*([0-9T:\-+.Z]+)/i);
+            if(lu) {
                 result.lastUpdate = lu[1];
                 break;
             }
         }
 
         // --- Parse TLD section ---
-        if (tldLines.some((l) => /refer:/i.test(l))) {
+        if(tldLines.some((l) => /refer:/i.test(l))) {
             // initialize
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const tldBlock: any = {
                 registryAddresses: [] as string[],
                 nameServers: [] as WhoisNameServer[],
             };
-            let currentContactType: 'administrative' | 'technical' | null =
-                null;
-            const tldContacts: Partial<
-                Record<'administrative' | 'technical', Partial<WhoisContact>>
-            > = {};
+            let currentContactType: 'administrative' | 'technical' | null = null;
+            const tldContacts: Partial<Record<'administrative' | 'technical', Partial<WhoisContact>>> = {};
 
-            for (const raw of tldLines) {
+            for(const raw of tldLines) {
                 const line = raw.trim();
-                if (
-                    !line ||
-                    line.startsWith('%') ||
-                    line.startsWith('>') ||
-                    line.startsWith('#')
-                ) {
+                if(!line || line.startsWith('%') || line.startsWith('>') || line.startsWith('#')) {
                     continue;
                 }
                 const [rawKey, ...rest] = line.split(':');
-                if (!rest.length) continue;
-                const key = rawKey.trim().toLowerCase();
+                if(!rest.length) continue;
+                const key = rawKey?.trim().toLowerCase();
                 const value = rest.join(':').trim();
 
                 // TLD contacts
-                if (key === 'contact') {
+                if(key === 'contact') {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     currentContactType = value.toLowerCase() as any;
-                    if (currentContactType) {
+                    if(currentContactType) {
                         tldContacts[currentContactType] = { addresses: [] };
                     }
                     continue;
                 }
-                if (currentContactType) {
+                if(currentContactType) {
                     const contact = tldContacts[currentContactType]!;
-                    switch (key) {
+                    switch(key) {
                         case 'name':
                             contact.name = value;
                             break;
@@ -199,7 +190,7 @@ export namespace WhoisTool {
                 }
 
                 // General TLD fields
-                switch (key) {
+                switch(key) {
                     case 'refer':
                         tldBlock.refer = value;
                         break;
@@ -219,8 +210,8 @@ export namespace WhoisTool {
                             const host = parts[0];
                             let ipv4: string | undefined;
                             let ipv6: string | undefined;
-                            for (const p of parts.slice(1)) {
-                                if (p.includes(':')) ipv6 = p;
+                            for(const p of parts.slice(1)) {
+                                if(p.includes(':')) ipv6 = p;
                                 else ipv4 = p;
                             }
                             tldBlock.nameServers.push({ host, ipv4, ipv6 });
@@ -251,20 +242,18 @@ export namespace WhoisTool {
             }
 
             // Attach parsed contacts
-            if (tldContacts.administrative) {
-                tldBlock.administrativeContact =
-                    tldContacts.administrative as WhoisContact;
+            if(tldContacts.administrative) {
+                tldBlock.administrativeContact = tldContacts.administrative as WhoisContact;
             }
-            if (tldContacts.technical) {
-                tldBlock.technicalContact =
-                    tldContacts.technical as WhoisContact;
+            if(tldContacts.technical) {
+                tldBlock.technicalContact = tldContacts.technical as WhoisContact;
             }
 
             result.tld = tldBlock;
         }
 
         // --- Parse Registrar/domain section ---
-        if (domainLines.some((l) => /domain name/i.test(l))) {
+        if(domainLines.some((l) => /domain name/i.test(l))) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const dom: any = {
                 statuses: [] as string[],
@@ -272,49 +261,35 @@ export namespace WhoisTool {
             };
             result.contacts = {};
 
-            for (const raw of domainLines) {
+            for(const raw of domainLines) {
                 const line = raw.trim();
-                if (
-                    !line ||
-                    line.startsWith('%') ||
-                    line.startsWith('>') ||
-                    line.startsWith('#')
-                ) {
+                if(!line || line.startsWith('%') || line.startsWith('>') || line.startsWith('#')) {
                     continue;
                 }
                 const [rawKey, ...rest] = line.split(':');
-                if (!rest.length) continue;
-                const key = rawKey.trim();
-                const keyLower = key.toLowerCase();
+                if(!rest.length) continue;
+                const key = rawKey?.trim();
+                const keyLower = key?.toLowerCase();
                 const value = rest.join(':').trim();
 
                 // Domain‑level contacts
-                const contactMatch = keyLower.match(
-                    /^(registrant|admin|tech)\s+(.+)$/i,
-                );
-                if (contactMatch) {
+                const contactMatch = keyLower?.match(/^(registrant|admin|tech)\s+(.+)$/i);
+                if(contactMatch && contactMatch[1] && contactMatch[2]) {
                     const kindRaw = contactMatch[1].toLowerCase();
                     const fieldRaw = contactMatch[2].toLowerCase();
                     const kind =
-                        kindRaw === 'registrant'
-                            ? 'registrant'
-                            : kindRaw === 'admin'
-                              ? 'administrative'
-                              : 'technical';
-                    const contact: WhoisRegistrarContact =
-                        result.contacts![kind] || {};
-                    if (fieldRaw === 'organization')
-                        contact.organization = value;
-                    else if (fieldRaw === 'state/province')
-                        contact.stateProvince = value;
-                    else if (fieldRaw === 'country') contact.country = value;
-                    else if (fieldRaw === 'email') contact.email = value;
+                        kindRaw === 'registrant' ? 'registrant' : kindRaw === 'admin' ? 'administrative' : 'technical';
+                    const contact: WhoisRegistrarContact = result.contacts![kind] || {};
+                    if(fieldRaw === 'organization') contact.organization = value;
+                    else if(fieldRaw === 'state/province') contact.stateProvince = value;
+                    else if(fieldRaw === 'country') contact.country = value;
+                    else if(fieldRaw === 'email') contact.email = value;
                     result.contacts![kind] = contact;
                     continue;
                 }
 
                 // Map domain fields
-                switch (keyLower) {
+                switch(keyLower) {
                     case 'domain name':
                         dom.domainName = value;
                         break;

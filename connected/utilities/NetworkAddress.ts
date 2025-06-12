@@ -29,20 +29,19 @@ export class NetworkAddress {
                 ipaddr.parseCIDR('ff00::/8'), // Multicast
             ];
 
-            if (parsedIP.kind() === 'ipv4') {
-                return !ipv4PrivateRanges.some((range) =>
-                    parsedIP.match(range),
-                );
+            if(parsedIP.kind() === 'ipv4') {
+                const ipv4 = parsedIP as ipaddr.IPv4;
+                return !ipv4PrivateRanges.some(([addr, prefixLength]) => ipv4.match(addr as ipaddr.IPv4, prefixLength));
             }
 
-            if (parsedIP.kind() === 'ipv6') {
-                return !ipv6PrivateRanges.some((range) =>
-                    parsedIP.match(range),
-                );
+            if(parsedIP.kind() === 'ipv6') {
+                const ipv6 = parsedIP as ipaddr.IPv6;
+                return !ipv6PrivateRanges.some(([addr, prefixLength]) => ipv6.match(addr as ipaddr.IPv6, prefixLength));
             }
 
             return false; // Unknown format (edge case)
-        } catch (error) {
+        }
+        catch(error) {
             console.error('Error parsing IP:', error);
             return false; // Invalid IPs are considered private (blocked)
         }

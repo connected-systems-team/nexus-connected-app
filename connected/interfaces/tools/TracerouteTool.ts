@@ -39,10 +39,7 @@ export namespace TracerouteTool {
      * @param includeRawOutput Whether to include the raw stdout/stderr in the result
      * @returns Structured traceroute data
      */
-    export function parseOutput(
-        result: Output,
-        includeRawOutput: boolean = false,
-    ): Result {
+    export function parseOutput(result: Output, includeRawOutput: boolean = false): Result {
         // Initialize the result object
         const parsedData: Result = {
             toolType: TracerouteTool.Type,
@@ -57,11 +54,7 @@ export namespace TracerouteTool {
         };
 
         // Include raw output if requested
-        if (
-            includeRawOutput &&
-            result.stdout !== undefined &&
-            result.stderr !== undefined
-        ) {
+        if(includeRawOutput && result.stdout !== undefined && result.stderr !== undefined) {
             parsedData.rawOutput = {
                 stdout: result.stdout,
                 stderr: result.stderr,
@@ -69,12 +62,12 @@ export namespace TracerouteTool {
         }
 
         // Parse destination information from stderr
-        if (result.stderr) {
+        if(result.stderr) {
             const stderrMatch = result.stderr.match(
                 /traceroute to ([^ ]+) \(([^)]+)\), (\d+) hops max, (\d+) byte packets/,
             );
 
-            if (stderrMatch) {
+            if(stderrMatch && stderrMatch[1] && stderrMatch[2] && stderrMatch[3] && stderrMatch[4]) {
                 parsedData.destination = {
                     domain: stderrMatch[1],
                     ip: stderrMatch[2],
@@ -85,7 +78,7 @@ export namespace TracerouteTool {
         }
 
         // Parse hop information from stdout
-        if (result.stdout) {
+        if(result.stdout) {
             const lines = result.stdout.trim().split('\n');
             parsedData.hops = parseHopLines(lines);
         }
@@ -125,12 +118,12 @@ function parseHopLines(lines: string[]): TracerouteHop[] {
     const hops: TracerouteHop[] = [];
     let currentHopNumber: number | null = null;
 
-    for (const line of lines) {
+    for(const line of lines) {
         const parsedLine = parseHopLine(line);
 
-        if (!parsedLine) continue;
+        if(!parsedLine) continue;
 
-        if (isHopWithNumber(parsedLine)) {
+        if(isHopWithNumber(parsedLine)) {
             // This is a new hop with a number
             hops.push({
                 number: parsedLine.number,
@@ -140,7 +133,8 @@ function parseHopLines(lines: string[]): TracerouteHop[] {
                 hostname: parsedLine.hostname || undefined,
             });
             currentHopNumber = parsedLine.number;
-        } else if (isContinuationIp(parsedLine) && currentHopNumber !== null) {
+        }
+        else if(isContinuationIp(parsedLine) && currentHopNumber !== null) {
             // This is a continuation with a different IP for the same hop
             hops.push({
                 number: currentHopNumber,
@@ -148,10 +142,13 @@ function parseHopLines(lines: string[]): TracerouteHop[] {
                 times: parsedLine.times,
                 isContinuation: true,
             });
-        } else if (isContinuationTime(parsedLine) && hops.length > 0) {
+        }
+        else if(isContinuationTime(parsedLine) && hops.length > 0) {
             // This is just an additional time measurement for the previous hop
             const lastHop = hops[hops.length - 1];
-            lastHop.times = lastHop.times.concat(parsedLine.times);
+            if(lastHop) {
+                lastHop.times = lastHop.times.concat(parsedLine.times);
+            }
         }
     }
 
@@ -161,21 +158,15 @@ function parseHopLines(lines: string[]): TracerouteHop[] {
 /**
  * Type guards for different types of parsed hop lines
  */
-function isHopWithNumber(
-    parsedLine: ParsedHopLine,
-): parsedLine is StandardHopLine | TimeoutHopLine {
+function isHopWithNumber(parsedLine: ParsedHopLine): parsedLine is StandardHopLine | TimeoutHopLine {
     return 'number' in parsedLine;
 }
 
-function isContinuationIp(
-    parsedLine: ParsedHopLine,
-): parsedLine is ContinuationIpLine {
+function isContinuationIp(parsedLine: ParsedHopLine): parsedLine is ContinuationIpLine {
     return parsedLine.type === 'continuation-ip';
 }
 
-function isContinuationTime(
-    parsedLine: ParsedHopLine,
-): parsedLine is ContinuationTimeLine {
+function isContinuationTime(parsedLine: ParsedHopLine): parsedLine is ContinuationTimeLine {
     return parsedLine.type === 'continuation-time';
 }
 
@@ -213,11 +204,7 @@ type ContinuationTimeLine = HopLineBase & {
     times: string[];
 };
 
-type ParsedHopLine =
-    | StandardHopLine
-    | TimeoutHopLine
-    | ContinuationIpLine
-    | ContinuationTimeLine;
+type ParsedHopLine = StandardHopLine | TimeoutHopLine | ContinuationIpLine | ContinuationTimeLine;
 
 /**
  * Parse a single line from traceroute output
@@ -231,27 +218,25 @@ function parseHopLine(line: string): ParsedHopLine | null {
     const dnsHopRegex =
         /^\s*(\d+)\s+(\S+)\s+\(([^)]+)\)(?:\s+([\d.]+)\s+ms)?(?:\s+([\d.]+)\s+ms)?(?:\s+([\d.]+)\s+ms)?$/;
 
-    if ((match = line.match(dnsHopRegex))) {
+    if((match = line.match(dnsHopRegex))) {
         const times: string[] = [];
-        if (match[4]) times.push(match[4]);
-        if (match[5]) times.push(match[5]);
-        if (match[6]) times.push(match[6]);
+        if(match[4]) times.push(match[4]);
+        if(match[5]) times.push(match[5]);
+        if(match[6]) times.push(match[6]);
 
         return {
             type: 'standard',
-            number: parseInt(match[1], 10),
-            hostname: match[2],
-            ip: match[3],
+            number: parseInt(match[1] || '0', 10),
+            hostname: match[2] || '',
+            ip: match[3] || '',
             times,
         };
     }
 
     // All the original formats still supported
-    const standardHopRegex =
-        /^\s*(\d+)\s+(\S+)\s+([\d.]+)\s+ms\s+([\d.]+)\s+ms\s+([\d.]+)\s+ms/;
+    const standardHopRegex = /^\s*(\d+)\s+(\S+)\s+([\d.]+)\s+ms\s+([\d.]+)\s+ms\s+([\d.]+)\s+ms/;
 
-    const partialHopRegex =
-        /^\s*(\d+)\s+(\S+)\s+([\d.]+)\s+ms\s+([\d.]+)\s+ms$/;
+    const partialHopRegex = /^\s*(\d+)\s+(\S+)\s+([\d.]+)\s+ms\s+([\d.]+)\s+ms$/;
 
     const singleTimeHopRegex = /^\s*(\d+)\s+(\S+)\s+([\d.]+)\s+ms$/;
 
@@ -264,35 +249,35 @@ function parseHopLine(line: string): ParsedHopLine | null {
     const timeOnlyRegex = /^\s+([\d.]+)\s+ms$/;
 
     // Non-DNS formats (existing fallback parsing)
-    if ((match = line.match(standardHopRegex))) {
+    if((match = line.match(standardHopRegex))) {
         return {
             type: 'standard',
-            number: parseInt(match[1], 10),
-            ip: match[2],
-            times: [match[3], match[4], match[5]],
+            number: parseInt(match[1] || '0', 10),
+            ip: match[2] || '',
+            times: [match[3] || '', match[4] || '', match[5] || ''],
         };
     }
 
-    if ((match = line.match(partialHopRegex))) {
+    if((match = line.match(partialHopRegex))) {
         return {
             type: 'partial',
-            number: parseInt(match[1], 10),
-            ip: match[2],
-            times: [match[3], match[4]],
+            number: parseInt(match[1] || '0', 10),
+            ip: match[2] || '',
+            times: [match[3] || '', match[4] || ''],
         };
     }
 
-    if ((match = line.match(singleTimeHopRegex))) {
+    if((match = line.match(singleTimeHopRegex))) {
         return {
             type: 'single',
-            number: parseInt(match[1], 10),
-            ip: match[2],
-            times: [match[3]],
+            number: parseInt(match[1] || '0', 10),
+            ip: match[2] || '',
+            times: [match[3] || ''],
         };
     }
 
-    if ((match = line.match(timeoutHopRegex))) {
-        const number = parseInt(match[1], 10);
+    if((match = line.match(timeoutHopRegex))) {
+        const number = parseInt(match[1] || '0', 10);
         const times: '*'[] = line
             .trim()
             .split(/\s+/)
@@ -307,27 +292,27 @@ function parseHopLine(line: string): ParsedHopLine | null {
         };
     }
 
-    if ((match = line.match(partialTimeoutRegex))) {
+    if((match = line.match(partialTimeoutRegex))) {
         return {
             type: 'partial-timeout',
-            number: parseInt(match[1], 10),
-            ip: match[2],
-            times: [match[3]],
+            number: parseInt(match[1] || '0', 10),
+            ip: match[2] || '',
+            times: [match[3] || ''],
         };
     }
 
-    if ((match = line.match(continuationWithIpRegex))) {
+    if((match = line.match(continuationWithIpRegex))) {
         return {
             type: 'continuation-ip',
-            ip: match[1],
-            times: [match[2]],
+            ip: match[1] || '',
+            times: [match[2] || ''],
         };
     }
 
-    if ((match = line.match(timeOnlyRegex))) {
+    if((match = line.match(timeOnlyRegex))) {
         return {
             type: 'continuation-time',
-            times: [match[1]],
+            times: [match[1] || ''],
         };
     }
 

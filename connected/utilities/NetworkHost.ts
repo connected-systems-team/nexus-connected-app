@@ -5,6 +5,11 @@ export class NetworkHost {
     readonly host: string;
     readonly type: 'ipv4' | 'ipv6' | 'domain';
 
+    constructor(host: string, type: 'ipv4' | 'ipv6' | 'domain') {
+        this.host = host;
+        this.type = type;
+    }
+
     /**
      * Retrieve and validate host information.
      * This function only returns if the host is a valid public IP address or domain
@@ -17,72 +22,62 @@ export class NetworkHost {
         let cleanHost = host;
 
         // Handle IPv6 with brackets and optional port
-        if (host.startsWith('[')) {
+        if(host.startsWith('[')) {
             const closingBracketIndex = host.indexOf(']');
-            if (closingBracketIndex !== -1) {
+            if(closingBracketIndex !== -1) {
                 cleanHost = host.substring(1, closingBracketIndex);
             }
-        } else {
+        }
+        else {
             // Handle IPv4 or domain with optional port
             const parts = host.split(':');
-            if (parts.length > 1) {
-                if (parts.length > 2 && host.includes('::')) {
+            if(parts.length > 1) {
+                if(parts.length > 2 && host.includes('::')) {
                     // Likely an unbracketed IPv6 address, keep intact
                     cleanHost = host;
-                } else {
+                }
+                else {
                     // Likely IPv4 or domain with port
-                    cleanHost = parts[0];
+                    cleanHost = parts[0] || host;
                 }
             }
         }
 
-        if (cleanHost.toLowerCase() === 'localhost') {
+        if(cleanHost.toLowerCase() === 'localhost') {
             throw new Error(`localhost not allowed: ${host}`);
         }
 
         const parts = cleanHost.split('.');
-        if (parts.length > 1 && blockedTLDs.has(parts[parts.length - 1])) {
+        const lastPart = parts[parts.length - 1];
+        if(parts.length > 1 && lastPart && blockedTLDs.has(lastPart)) {
             throw new Error(`Blocked top-level domain: ${host}`);
         }
 
         // Check if it's an IP address
         try {
             const parsed = ipaddr.parse(cleanHost);
-            if (!NetworkAddress.isPublicIP(cleanHost)) {
-                throw new Error(
-                    `Invalid IP Address is private or not publicly routable: ${cleanHost}`,
-                );
+            if(!NetworkAddress.isPublicIP(cleanHost)) {
+                throw new Error(`Invalid IP Address is private or not publicly routable: ${cleanHost}`);
             }
 
-            return {
-                host: cleanHost,
-                type: parsed.kind() === 'ipv4' ? 'ipv4' : 'ipv6',
-            };
+            return new NetworkHost(cleanHost, parsed.kind() === 'ipv4' ? 'ipv4' : 'ipv6');
         } catch {
             // Not an IP — move to domain validation
         }
 
-        if (cleanHost.length > 253) {
-            throw new Error(
-                `Exceeded the maximum domain length (253 characters): ${cleanHost}`,
-            );
+        if(cleanHost.length > 253) {
+            throw new Error(`Exceeded the maximum domain length (253 characters): ${cleanHost}`);
         }
-        if (parts.some((p) => p.length > 63)) {
-            throw new Error(
-                `One or more labels exceed the 63-character limit: ${cleanHost}`,
-            );
+        if(parts.some((p) => p.length > 63)) {
+            throw new Error(`One or more labels exceed the 63-character limit: ${cleanHost}`);
         }
 
-        const domainPattern =
-            /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/;
-        if (!domainPattern.test(cleanHost)) {
+        const domainPattern = /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/;
+        if(!domainPattern.test(cleanHost)) {
             throw new Error(`Invalid domain: ${cleanHost}`);
         }
 
-        return {
-            host: cleanHost,
-            type: 'domain',
-        };
+        return new NetworkHost(cleanHost, 'domain');
     }
 }
 
