@@ -1,9 +1,10 @@
 import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
 import { ConnectedTool } from '../ConnectedTool';
+import { ConnectedToolType } from '../ConnectedToolType';
 import { ProcessOutput } from '../ProcessOutput';
 
 export namespace PingTool {
-    export const Type = ConnectedTool.Type.Ping;
+    export const Type = ConnectedToolType.Ping;
 
     export interface Input extends ConnectedTool.Brand<typeof Type> {
         host: string;

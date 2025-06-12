@@ -1,9 +1,10 @@
 import { NetworkUrl } from '@nexus/connected/utilities/NetworkUrl';
 import { ConnectedTool } from '../ConnectedTool';
+import { ConnectedToolType } from '../ConnectedToolType';
 import { ProcessOutput } from '../ProcessOutput';
 
 export namespace HttpTraceTool {
-    export const Type = ConnectedTool.Type.HttpTrace;
+    export const Type = ConnectedToolType.HttpTrace;
 
     export interface Input extends ConnectedTool.Brand<typeof Type> {
         url: string;

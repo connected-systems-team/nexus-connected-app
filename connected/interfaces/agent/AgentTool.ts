@@ -1,9 +1,10 @@
 import { ConnectedTool } from '../ConnectedTool';
+import { ConnectedToolType } from '../ConnectedToolType';
 import { GridRegionLevels } from '../region/GridRegionLevels';
 import { AgentPredicate } from './AgentPredicate';
 
 export interface AgentTool<
-    ToolType extends ConnectedTool.Type = ConnectedTool.Type,
+    ToolType extends ConnectedToolType = ConnectedToolType,
 > {
     /**
      * The input for the agent, this specifies the type of tool,

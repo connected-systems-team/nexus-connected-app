@@ -1,8 +1,9 @@
 import { NetworkUrl } from '@nexus/connected/utilities/NetworkUrl';
 import { ConnectedTool } from '../ConnectedTool';
+import { ConnectedToolType } from '../ConnectedToolType';
 
 export namespace FetchTool {
-    export const Type = ConnectedTool.Type.Fetch;
+    export const Type = ConnectedToolType.Fetch;
 
     export interface Input extends ConnectedTool.Brand<typeof Type> {
         url: string;

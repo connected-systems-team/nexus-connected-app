@@ -1,3 +1,4 @@
+import { ConnectedToolType } from './ConnectedToolType';
 import { GridRegionLevels } from './region/GridRegionLevels';
 import { DnsTool } from './tools/DnsTool';
 import { DnsTraceTool } from './tools/DnsTraceTool';
@@ -10,18 +11,6 @@ import { TracerouteTool } from './tools/TracerouteTool';
 import { WhoisTool } from './tools/WhoisTool';
 
 export namespace ConnectedTool {
-    export enum Type {
-        Dns = 'Dns',
-        DnsTrace = 'DnsTrace',
-        Fetch = 'Fetch',
-        HttpTrace = 'HttpTrace',
-        Ping = 'Ping',
-        PortCheck = 'PortCheck',
-        Traceroute = 'Traceroute',
-        TlsCertificate = 'TlsCertificate',
-        Whois = 'Whois',
-    }
-
     export type Input =
         | DnsTool.Input
         | DnsTraceTool.Input
@@ -50,18 +39,18 @@ export namespace ConnectedTool {
         Maximum: 60000, // 60 seconds
     } as const;
 
-    export interface Brand<Type extends ConnectedTool.Type> {
+    export interface Brand<Type extends ConnectedToolType> {
         toolType: Type;
     }
 
-    export type WithBrand<T, Type extends ConnectedTool.Type> = T & Brand<Type>;
+    export type WithBrand<T, Type extends ConnectedToolType> = T & Brand<Type>;
 
     export type WithRegion<T> = T & {
         regions?: ReadonlyArray<GridRegionLevels>;
     };
 
     // Extract a specific tool type by its toolType value
-    export type ExtractByToolType<T extends ConnectedTool.Type, K> = Extract<
+    export type ExtractByToolType<T extends ConnectedToolType, K> = Extract<
         K,
         { toolType: T }
     >;

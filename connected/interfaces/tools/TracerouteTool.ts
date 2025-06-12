@@ -1,9 +1,10 @@
 import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
 import { ConnectedTool } from '../ConnectedTool';
+import { ConnectedToolType } from '../ConnectedToolType';
 import { ProcessOutput } from '../ProcessOutput';
 
 export namespace TracerouteTool {
-    export const Type = ConnectedTool.Type.Traceroute;
+    export const Type = ConnectedToolType.Traceroute;
 
     export interface Input extends ConnectedTool.Brand<typeof Type> {
         host: string;

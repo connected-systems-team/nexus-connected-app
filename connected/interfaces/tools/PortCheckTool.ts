@@ -1,10 +1,11 @@
 import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
 import { NetworkPort } from '@nexus/connected/utilities/NetworkPort';
 import { ConnectedTool } from '../ConnectedTool';
+import { ConnectedToolType } from '../ConnectedToolType';
 import { ProcessOutput } from '../ProcessOutput';
 
 export namespace PortCheckTool {
-    export const Type = ConnectedTool.Type.PortCheck;
+    export const Type = ConnectedToolType.PortCheck;
 
     export interface Input extends ConnectedTool.Brand<typeof Type> {
         host: string;

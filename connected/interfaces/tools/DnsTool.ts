@@ -1,8 +1,9 @@
 import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
 import { ConnectedTool } from '../ConnectedTool';
+import { ConnectedToolType } from '../ConnectedToolType';
 
 export namespace DnsTool {
-    export const Type = ConnectedTool.Type.Dns;
+    export const Type = ConnectedToolType.Dns;
 
     export interface Input extends ConnectedTool.Brand<typeof Type> {
         domain: string;

@@ -1,9 +1,10 @@
 import { NetworkHost } from '@nexus/connected/utilities/NetworkHost';
 import { ConnectedTool } from '../ConnectedTool';
+import { ConnectedToolType } from '../ConnectedToolType';
 import { ProcessOutput } from '../ProcessOutput';
 
 export namespace WhoisTool {
-    export const Type = ConnectedTool.Type.Whois;
+    export const Type = ConnectedToolType.Whois;
 
     export interface Input extends ConnectedTool.Brand<typeof Type> {
         host: string;
@@ -79,7 +80,7 @@ export namespace WhoisTool {
         }
 
         const result: Result = {
-            toolType: ConnectedTool.Type.Whois,
+            toolType: ConnectedToolType.Whois,
             matched: true,
         };
         const lines = output.stdout.split(/\r?\n/);
