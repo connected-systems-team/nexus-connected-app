@@ -16,7 +16,7 @@ export namespace TracerouteTool {
 
     export type Output = ConnectedTool.WithBrand<
         {
-            parsed: Result;
+            parsed: ParsedResult;
             raw: ProcessOutput;
         },
         typeof Type
@@ -25,7 +25,7 @@ export namespace TracerouteTool {
     /**
      * Type definition for the parsed traceroute data
      */
-    export type Result = {
+    export type ParsedResult = {
         success: boolean;
         destination: TracerouteDestination;
         hops: TracerouteHop[];
@@ -33,7 +33,7 @@ export namespace TracerouteTool {
             stdout: string;
             stderr: string;
         };
-    } & ConnectedTool.Brand<typeof Type>;
+    };
 
     export function validateInput(input: Input): void {
         NetworkHost.getHost(input.host); // Validate domain format
@@ -48,10 +48,9 @@ export namespace TracerouteTool {
     export function parseOutput(
         result: ProcessOutput,
         includeRawOutput: boolean = false,
-    ): Result {
+    ): ParsedResult {
         // Initialize the result object
-        const parsedData: Result = {
-            toolType: TracerouteTool.Type,
+        const parsedData: ParsedResult = {
             success: result.exitCode === 0,
             destination: {
                 domain: '',

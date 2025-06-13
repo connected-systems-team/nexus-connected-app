@@ -14,7 +14,7 @@ export namespace PingTool {
 
     export type Output = ConnectedTool.WithBrand<
         {
-            parsed: Result;
+            parsed?: Result;
             raw: ProcessOutput;
         },
         typeof Type

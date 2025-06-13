@@ -13,7 +13,7 @@ export namespace WhoisTool {
 
     export type Output = ConnectedTool.WithBrand<
         {
-            parsed: Result | undefined;
+            parsed: ParsedResult | undefined;
             raw: ProcessOutput;
         },
         typeof Type
@@ -22,7 +22,7 @@ export namespace WhoisTool {
     /**
      * The fully structured WHOIS result
      */
-    export interface Result extends ConnectedTool.Brand<typeof Type> {
+    export interface ParsedResult {
         matched: boolean;
         noMatchDomain?: string;
         lastUpdate?: string;
@@ -80,13 +80,14 @@ export namespace WhoisTool {
     /**
      * Parses raw WHOIS stdout into a fully‑structured object.
      */
-    export function parseOutput(output: ProcessOutput): Result | undefined {
+    export function parseOutput(
+        output: ProcessOutput,
+    ): ParsedResult | undefined {
         if (!output || !output.stdout) {
             return;
         }
 
-        const result: Result = {
-            toolType: ConnectedToolType.Whois,
+        const result: ParsedResult = {
             matched: true,
         };
         const lines = output.stdout.split(/\r?\n/);
