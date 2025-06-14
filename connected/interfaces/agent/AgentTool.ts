@@ -121,6 +121,6 @@ export type AgentNotificationSettings = {
         | {
               kind: 'window';
               count: number;
-              window: number;
+              windowMs: number;
           };
 };
